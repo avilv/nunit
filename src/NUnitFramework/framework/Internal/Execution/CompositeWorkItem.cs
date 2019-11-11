@@ -214,7 +214,7 @@ namespace NUnit.Framework.Internal.Execution
                     command = new OneTimeSetUpCommand(command, item);
 
                 // Construct the fixture if necessary
-                if (!Test.TypeInfo.IsStaticClass)
+                if (!Test.TypeInfo.IsStaticClass || this.InstancePerTestCase)
                     command = new ConstructFixtureCommand(command);
             }
 

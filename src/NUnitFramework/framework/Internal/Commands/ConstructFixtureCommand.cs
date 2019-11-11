@@ -48,9 +48,17 @@ namespace NUnit.Framework.Internal.Commands
                     // Use preconstructed fixture if available, otherwise construct it
                     if (!typeInfo.IsStaticClass)
                     {
-                        context.TestObject = Test.Fixture ?? typeInfo.Construct(((TestSuite)Test).Arguments);
-                        if (Test.Fixture == null)
+                        if (context.InstancePerTestCase)
+                        {
+                            context.TestObject = typeInfo.Construct(((TestSuite)Test).Arguments);
                             Test.Fixture = context.TestObject;
+                        }
+                        else
+                        {
+                            context.TestObject = Test.Fixture ?? typeInfo.Construct(((TestSuite)Test).Arguments);
+                            if (Test.Fixture == null)
+                                Test.Fixture = context.TestObject;
+                        }
                     }
                 }
             };

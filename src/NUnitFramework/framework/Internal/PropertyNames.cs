@@ -137,6 +137,11 @@ namespace NUnit.Framework.Internal
         /// The optional Order the test will run in
         /// </summary>
         public const string Order = "Order";
+
+        /// <summary>
+        /// Each test case will run in a new fixture instance.
+        /// </summary>
+        public const string InstancePerTestCase = "InstancePerTestCase";
         #endregion
     }
 }
