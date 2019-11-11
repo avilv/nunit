@@ -67,8 +67,6 @@ namespace NUnit.Framework.Internal.Execution
                 ? (ParallelScope)Test.Properties.Get(PropertyNames.ParallelScope)
                 : ParallelScope.Default;
 
-            InstancePerTestCase = Test.Properties.ContainsKey(PropertyNames.InstancePerTestCase);
-
             TargetApartment = GetTargetApartment(Test);
 
             State = WorkItemState.Ready;
@@ -187,11 +185,6 @@ namespace NUnit.Framework.Internal.Execution
         /// otherwise returning ParallelScope.Default;
         /// </summary>
         public ParallelScope ParallelScope { get; }
-
-        /// <summary>
-        /// Determines if each test case will run in a new fixture instance.
-        /// </summary>
-        public bool InstancePerTestCase { get; }
 
         internal ApartmentState TargetApartment { get; set; }
         private ApartmentState CurrentApartment { get; set; }

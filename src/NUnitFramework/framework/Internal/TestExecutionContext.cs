@@ -289,11 +289,6 @@ namespace NUnit.Framework.Internal
         public ParallelScope ParallelScope { get; set; }
 
         /// <summary>
-        /// Determines if each test case will run in a new fixture instance.
-        /// </summary>
-        public bool InstancePerTestCase { get; set; }
-
-        /// <summary>
         /// Default tolerance value used for floating point equality
         /// when no other tolerance is specified.
         /// </summary>
