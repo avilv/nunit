@@ -21,6 +21,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************
 
+using System;
 using NUnit.Framework.Interfaces;
 
 namespace NUnit.Framework.Internal.Commands
@@ -45,12 +46,23 @@ namespace NUnit.Framework.Internal.Commands
 
                 if (typeInfo != null)
                 {
-                    // Use preconstructed fixture if available, otherwise construct it
+
+
                     if (!typeInfo.IsStaticClass)
                     {
-                        context.TestObject = Test.Fixture ?? typeInfo.Construct(((TestSuite)Test).Arguments);
-                        if (Test.Fixture == null)
-                            Test.Fixture = context.TestObject;
+
+                        if (context.ShouldCreateInstancePerTestCase)
+                        {
+                            // let context create its TestObject on demand.
+                            context.TestObjectConstructor = () => typeInfo.Construct(((TestSuite)Test).Arguments);
+                            // TODO: check leaving Test.Fixture as null is safe
+                        } else
+                        {
+                            // Use preconstructed fixture if available, otherwise construct it
+                            context.TestObject = Test.Fixture ?? typeInfo.Construct(((TestSuite)Test).Arguments);
+                            if (Test.Fixture == null)
+                                Test.Fixture = context.TestObject;
+                        }
                     }
                 }
             };

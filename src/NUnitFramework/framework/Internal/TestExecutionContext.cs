@@ -88,9 +88,9 @@ namespace NUnit.Framework.Internal
 
         private SandboxedThreadState _sandboxedThreadState;
 
-#endregion
+        #endregion
 
-#region Constructors
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestExecutionContext"/> class.
@@ -118,8 +118,9 @@ namespace NUnit.Framework.Internal
 
             CurrentTest = other.CurrentTest;
             CurrentResult = other.CurrentResult;
-            TestObject = other.TestObject;
             _listener = other._listener;
+            TestObject = other.TestObject;
+            TestObjectConstructor = other.TestObjectConstructor;
             StopOnError = other.StopOnError;
             TestCaseTimeout = other.TestCaseTimeout;
             UpstreamActions = new List<ITestAction>(other.UpstreamActions);
@@ -133,11 +134,14 @@ namespace NUnit.Framework.Internal
             Dispatcher = other.Dispatcher;
             ParallelScope = other.ParallelScope;
             IsSingleThreaded = other.IsSingleThreaded;
+            LifeCycle = other.LifeCycle;
         }
 
-#endregion
+        #endregion
 
-#region CurrentContext Instance
+
+
+        #region CurrentContext Instance
 
         // NOTE: We use different implementations for various platforms.
 
@@ -194,9 +198,9 @@ namespace NUnit.Framework.Internal
         }
 #endif
 
-#endregion
+        #endregion
 
-#region Properties
+        #region Properties
 
         /// <summary>
         /// Gets or sets the current test
@@ -224,6 +228,18 @@ namespace NUnit.Framework.Internal
                 _currentResult = value;
                 if (value != null)
                     OutWriter = value.OutWriter;
+            }
+        }
+
+        /// <summary>
+        /// Determines if this context should create an instance per test case.
+        /// </summary>
+        public bool ShouldCreateInstancePerTestCase
+        {
+            get
+            {
+                return LifeCycle == LifeCycle.InstancePerTestCase ||
+                  (LifeCycle == LifeCycle.InstancePerTestCaseForParallelFixtures && ParallelScope.HasFlag(ParallelScope.Children));
             }
         }
 
@@ -267,6 +283,8 @@ namespace NUnit.Framework.Internal
             }
         }
 
+        internal Func<object> TestObjectConstructor { get; set; }
+
         /// <summary>
         /// The current test event listener
         /// </summary>
@@ -289,6 +307,11 @@ namespace NUnit.Framework.Internal
         public ParallelScope ParallelScope { get; set; }
 
         /// <summary>
+        /// The LifeCycle specified for the current test object.
+        /// </summary>
+        public LifeCycle LifeCycle { get; set; }
+
+        /// <summary>
         /// Default tolerance value used for floating point equality
         /// when no other tolerance is specified.
         /// </summary>
@@ -298,7 +321,7 @@ namespace NUnit.Framework.Internal
         /// The worker that spawned the context.
         /// For builds without the parallel feature, it is null.
         /// </summary>
-        public TestWorker TestWorker {get; internal set;}
+        public TestWorker TestWorker { get; internal set; }
 
         /// <summary>
         /// Gets the RandomGenerator specific to this Test
@@ -396,9 +419,20 @@ namespace NUnit.Framework.Internal
         /// </summary>
         public int CurrentRepeatCount { get; set; }
 
-#endregion
+        #endregion
 
-#region Instance Methods
+        #region Instance Methods
+
+        /// <summary>
+        /// Initializes a TestExecutionContext
+        /// </summary>
+        public void InitializeContext()
+        {
+            if (TestObjectConstructor != null && ShouldCreateInstancePerTestCase)
+            {
+                TestObject = TestObjectConstructor();
+            }
+        }
 
         /// <summary>
         /// Record any changes in the environment made by
@@ -489,9 +523,9 @@ namespace NUnit.Framework.Internal
             return null;
         }
 
-#endregion
+        #endregion
 
-#region Nested IsolatedContext Class
+        #region Nested IsolatedContext Class
 
         /// <summary>
         /// An IsolatedContext is used when running code
@@ -558,6 +592,6 @@ namespace NUnit.Framework.Internal
             private void AdhocTestMethod() { }
         }
 
-#endregion
+        #endregion
     }
 }

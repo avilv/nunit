@@ -108,7 +108,8 @@ namespace NUnit.Framework.Internal.Execution
         public void InitializeContext(TestExecutionContext context)
         {
             Guard.OperationValid(Context == null, "The context has already been initialized");
-
+            
+            context.InitializeContext();
             Context = context;
         }
 
