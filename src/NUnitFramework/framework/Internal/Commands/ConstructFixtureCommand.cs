@@ -42,6 +42,8 @@ namespace NUnit.Framework.Internal.Commands
             while (testSuite != null && !testSuite.IsSuite)
                 testSuite = testSuite.Parent;
 
+            Guard.ArgumentValid(testSuite is TestSuite, "ConstructFixtureCommand must reference a TestSuite", nameof(innerCommand));
+
             BeforeTest = (context) =>
             {
                 ITypeInfo typeInfo = Test.TypeInfo;

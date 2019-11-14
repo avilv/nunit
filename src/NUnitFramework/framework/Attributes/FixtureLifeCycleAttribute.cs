@@ -56,22 +56,6 @@ namespace NUnit.Framework
         /// </summary>
         public LifeCycle LifeCycle { get; }
 
-        /// <summary>
-        /// Overridden to check for invalid combinations of settings
-        /// </summary>
-        /// <param name="test"></param>
-        public override void ApplyToTest(Test test)
-        {
-            base.ApplyToTest(test);
-
-            if (test.RunState == RunState.NotRunnable)
-                return;
-
-            if (LifeCycle == LifeCycle.InstancePerTestCaseForParallelFixtures && test is TestFixture)
-            {
-                test.MakeInvalid("May not specify LifeCycle.InstancePerTestCaseForParallelFixtures on a test fixture");
-            }
-        }
 
         #region IApplyToContext Interface
 

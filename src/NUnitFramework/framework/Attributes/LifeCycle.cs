@@ -34,11 +34,6 @@ namespace NUnit.Framework
         SingleInstance,
 
         /// <summary>
-        /// A new instance is created for each test case for fixtures that are marked with <see cref="ParallelizableAttribute"/>.
-        /// </summary>
-        InstancePerTestCaseForParallelFixtures,
-
-        /// <summary>
         /// A new instance is created for each test case.
         /// </summary>
         InstancePerTestCase

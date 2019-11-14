@@ -232,18 +232,6 @@ namespace NUnit.Framework.Internal
         }
 
         /// <summary>
-        /// Determines if this context should create an instance per test case.
-        /// </summary>
-        public bool ShouldCreateInstancePerTestCase
-        {
-            get
-            {
-                return LifeCycle == LifeCycle.InstancePerTestCase ||
-                  (LifeCycle == LifeCycle.InstancePerTestCaseForParallelFixtures && ParallelScope.HasFlag(ParallelScope.Children));
-            }
-        }
-
-        /// <summary>
         /// Gets a TextWriter that will send output to the current test result.
         /// </summary>
         public TextWriter OutWriter { get; private set; }
