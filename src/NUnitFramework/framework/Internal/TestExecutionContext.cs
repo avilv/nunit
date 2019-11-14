@@ -423,16 +423,6 @@ namespace NUnit.Framework.Internal
 
         #region Instance Methods
 
-        /// <summary>
-        /// Initializes a TestExecutionContext
-        /// </summary>
-        public void InitializeContext()
-        {
-            if (TestObjectConstructor != null && ShouldCreateInstancePerTestCase)
-            {
-                TestObject = TestObjectConstructor();
-            }
-        }
 
         /// <summary>
         /// Record any changes in the environment made by

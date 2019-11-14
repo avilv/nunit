@@ -38,7 +38,9 @@ namespace NUnit.Framework.Internal.Commands
         public ConstructFixtureCommand(TestCommand innerCommand)
             : base(innerCommand)
         {
-            Guard.ArgumentValid(Test is TestSuite, "ConstructFixtureCommand must reference a TestSuite", nameof(innerCommand));
+            ITest testSuite = Test;
+            while (testSuite != null && !testSuite.IsSuite)
+                testSuite = testSuite.Parent;
 
             BeforeTest = (context) =>
             {
@@ -50,19 +52,10 @@ namespace NUnit.Framework.Internal.Commands
 
                     if (!typeInfo.IsStaticClass)
                     {
-
-                        if (context.ShouldCreateInstancePerTestCase)
-                        {
-                            // let context create its TestObject on demand.
-                            context.TestObjectConstructor = () => typeInfo.Construct(((TestSuite)Test).Arguments);
-                            // TODO: check leaving Test.Fixture as null is safe
-                        } else
-                        {
-                            // Use preconstructed fixture if available, otherwise construct it
-                            context.TestObject = Test.Fixture ?? typeInfo.Construct(((TestSuite)Test).Arguments);
-                            if (Test.Fixture == null)
-                                Test.Fixture = context.TestObject;
-                        }
+                        // Use preconstructed fixture if available, otherwise construct it
+                        context.TestObject = Test.Fixture ?? typeInfo.Construct(testSuite.Arguments);
+                        if (Test.Fixture == null)
+                            Test.Fixture = context.TestObject;
                     }
                 }
             };

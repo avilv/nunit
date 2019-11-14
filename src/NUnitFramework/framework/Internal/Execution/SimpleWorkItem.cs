@@ -140,6 +140,8 @@ namespace NUnit.Framework.Internal.Execution
                 foreach (var attr in method.GetCustomAttributes<IApplyToContext>(true))
                     command = new ApplyChangesToContextCommand(command, attr);
 
+                if (Context.LifeCycle == LifeCycle.InstancePerTestCase)
+                    command = new ConstructFixtureCommand(command);
                 // If a timeout is specified, create a TimeoutCommand
                 // Timeout set at a higher level
                 int timeout = Context.TestCaseTimeout;

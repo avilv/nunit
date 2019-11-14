@@ -109,7 +109,6 @@ namespace NUnit.Framework.Internal.Execution
         {
             Guard.OperationValid(Context == null, "The context has already been initialized");
             
-            context.InitializeContext();
             Context = context;
         }
 

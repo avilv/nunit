@@ -122,8 +122,9 @@ namespace NUnit.Framework.Internal.Execution
                                 // Directly execute the OneTimeFixtureTearDown for tests that
                                 // were skipped, failed or set to inconclusive in one time setup
                                 // unless we are aborting.
-                                if (Context.ExecutionStatus != TestExecutionStatus.AbortRequested)
-                                    PerformOneTimeTearDown();
+                                if (!(Test is TestFixture && Context.LifeCycle == LifeCycle.InstancePerTestCase))
+                                    if (Context.ExecutionStatus != TestExecutionStatus.AbortRequested)
+                                        PerformOneTimeTearDown();
                             }
                             else if (Test.TestType == "Theory")
                                 Result.SetResult(ResultState.Failure, "No test cases were provided");
@@ -180,7 +181,7 @@ namespace NUnit.Framework.Internal.Execution
                 // ParameterizedMethodSuites and individual test cases both use the same
                 // MethodInfo as a source of attributes. We handle the Test and Default targets
                 // in the test case, so we don't want to doubly handle it here.
-                bool applyToSuite =  action.Targets.HasFlag(ActionTargets.Suite)
+                bool applyToSuite = action.Targets.HasFlag(ActionTargets.Suite)
                     || action.Targets == ActionTargets.Default && !(Test is ParameterizedMethodSuite);
 
                 bool applyToTest = action.Targets.HasFlag(ActionTargets.Test)
@@ -214,7 +215,7 @@ namespace NUnit.Framework.Internal.Execution
                     command = new OneTimeSetUpCommand(command, item);
 
                 // Construct the fixture if necessary
-                if (!Test.TypeInfo.IsStaticClass)
+                if (Context.LifeCycle == LifeCycle.SingleInstance && !Test.TypeInfo.IsStaticClass)
                     command = new ConstructFixtureCommand(command);
             }
 
@@ -243,7 +244,8 @@ namespace NUnit.Framework.Internal.Execution
                 command = new OneTimeTearDownCommand(command, item);
 
             // Dispose of fixture if necessary
-            if (Test is IDisposableFixture && typeof(IDisposable).IsAssignableFrom(Test.TypeInfo.Type))
+
+            if (Context.LifeCycle == LifeCycle.SingleInstance && Test is IDisposableFixture && typeof(IDisposable).IsAssignableFrom(Test.TypeInfo.Type))
                 command = new DisposeFixtureCommand(command);
 
             return command;
@@ -296,7 +298,7 @@ namespace NUnit.Framework.Internal.Execution
             // If run was cancelled, reduce countdown by number of
             // child items not yet staged and check if we are done.
             if (childCount > 0)
-                lock(_childCompletionLock)
+                lock (_childCompletionLock)
                 {
                     _childTestCountdown.Signal(childCount);
                     if (_childTestCountdown.CurrentCount == 0)
