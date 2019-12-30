@@ -36,6 +36,50 @@ namespace NUnit.Framework.Attributes
     public class LifeCycleAttributeTests
     {
         [Test]
+        public void InstancePerTestCaseCanRunMultipleOneTimeSetup()
+        {
+            TestAssert.IsRunnable(typeof(MultipleLifeCycleTestFixtureSetUpAttributes));
+        }
+
+        [Test]
+        public void InstancePerTestCaseCanRunMultipleOneTimeTearDown()
+        {
+            TestAssert.IsRunnable(typeof(MultipleOneTimeSetupTearDownLifeCycleTestFixture));
+        }
+
+        [Test]
+        public void InstancePerTestCaseMultipleOneTimeSetupRunsAreCalled()
+        {
+            var fixture = new MultipleOneTimeSetupTearDownLifeCycleTestFixture();
+            //  var fixture = TestBuilder.MakeFixture(typeof(MultipleOneTimeSetupTearDownLifeCycleTestFixture));
+            var r = TestBuilder.RunTestFixture(fixture);
+
+            //Assert.AreEqual(2, fixture. .SetUpCount, "SetUp");
+            //Assert.AreEqual(2, fixture.TearDownCount, "TearDown");
+        }
+
+        [Test]
+        public void InstancePerTestCaseSetupRunsOnce()
+        {
+            var fixture = new SetupTearDownLifeCycleTestFixture();
+            
+            TestBuilder.RunTestFixture(fixture);
+
+            Assert.AreEqual(1, fixture.SetUpCount, "SetUp");
+            Assert.AreEqual(1, fixture.TearDownCount, "TearDown");
+        }
+
+        [Test]
+        public void InstancePerTestCaseOneTimeSetupRunsOnce()
+        {
+            var fixture = new OneTimeSetupTearDownLifeCycleTestFixture();
+            TestBuilder.RunTestFixture(fixture);
+
+            Assert.AreEqual(1, fixture.SetUpCount, "SetUp");
+            Assert.AreEqual(1, fixture.TearDownCount, "TearDown");
+        }
+
+        [Test]
         public void InstancePerTestCaseCreatesAnInstanceForEachTestCase()
         {
             var fixture = TestBuilder.MakeFixture(typeof(CountingLifeCycleTestFixture));

@@ -38,18 +38,16 @@ namespace NUnit.Framework.Internal.Commands
         public FixturePerTestCaseCommand(TestCommand innerCommand)
             : base(innerCommand)
         {
-            TestSuite testSuite = null;
             TestFixture testFixture = null;
 
             ITest currentTest = Test;
-            while (currentTest != null && (testSuite == null || testFixture == null))
+            while (currentTest != null && (testFixture == null))
             {
-                testSuite = testSuite ?? currentTest as TestSuite;
                 testFixture = testFixture ?? currentTest as TestFixture;
                 currentTest = currentTest.Parent;
             }
 
-            Guard.ArgumentValid(testSuite != null, "FixturePerTestCaseCommand must reference a TestSuite", nameof(innerCommand));
+            Guard.ArgumentValid(testFixture != null, "FixturePerTestCaseCommand must reference a TestSuite", nameof(innerCommand));
 
             BeforeTest = (context) =>
             {
@@ -57,15 +55,16 @@ namespace NUnit.Framework.Internal.Commands
 
                 if (typeInfo != null && !typeInfo.IsStaticClass)
                 {
-                    context.TestObject = typeInfo.Construct(testSuite.Arguments);
+                    context.TestObject = Test.Fixture ?? typeInfo.Construct(testFixture.Arguments);
                     Test.Fixture = context.TestObject;
                 }
             };
 
             AfterTest = (context) =>
             {
+                
                 ITypeInfo typeInfo = Test.TypeInfo;
-                if (typeInfo != null && !typeInfo.IsStaticClass && typeof(IDisposable).IsAssignableFrom(typeInfo.Type))
+                if (typeInfo != null && !typeInfo.IsStaticClass)
                 {
                     try
                     {
@@ -73,8 +72,11 @@ namespace NUnit.Framework.Internal.Commands
                         if (disposable != null)
                         {
                             disposable.Dispose();
-                            context.TestObject = null;
                         }
+                        context.TestObject = null;
+
+
+                        ClearFixture(Test);
                     }
                     catch (Exception ex)
                     {
@@ -82,6 +84,20 @@ namespace NUnit.Framework.Internal.Commands
                     }
                 }
             };
+        }
+
+        private void ClearFixture(ITest test)
+        {
+       
+            while (test != null)
+            {
+                var currentTest = test as Test;
+                if (currentTest != null)
+                    currentTest.Fixture = null;
+ 
+                test = test.Parent;
+            }
+
         }
     }
 }

@@ -214,7 +214,7 @@ namespace NUnit.Framework.Internal.Execution
                     command = new OneTimeSetUpCommand(command, item);
 
                 // Construct the fixture if necessary
-                if (!Test.TypeInfo.IsStaticClass && (Test as TestFixture)?.LifeCycle != LifeCycle.InstancePerTestCase)
+                if (!Test.TypeInfo.IsStaticClass)
                     command = new ConstructFixtureCommand(command);
             }
 
@@ -291,6 +291,7 @@ namespace NUnit.Framework.Internal.Execution
                 child.TestWorker = TestWorker;
 
                 Context.Dispatcher.Dispatch(child);
+                Context.TestObject = child.Context.TestObject;
                 childCount--;
             }
 

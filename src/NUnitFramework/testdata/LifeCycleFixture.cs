@@ -31,6 +31,137 @@ using NUnit.Framework;
 namespace NUnit.TestData.LifeCycleTests
 {
     [TestFixture]
+    [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
+    public class MultipleLifeCycleTestFixtureSetUpAttributes
+    {
+        [OneTimeSetUp]
+        public void Init1()
+        {
+        }
+
+        [OneTimeSetUp]
+        public void Init2()
+        {
+        }
+
+        [Test]
+        public void OneTest()
+        {
+        }
+    }
+
+    [TestFixture]
+    [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
+    public class  MultipleLifeCycleTestFixtureTearDownAttributes
+    {
+        [OneTimeTearDown]
+        public void Destroy1()
+        {
+        }
+
+        [OneTimeTearDown]
+        public void Destroy2()
+        {
+        }
+
+        [Test]
+        public void OneTest()
+        {
+        }
+    }
+
+    [TestFixture]
+    [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
+    public class MultipleOneTimeSetupTearDownLifeCycleTestFixture
+    {
+        public int SetUpCount = 0;
+        public int TearDownCount = 0;
+
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            SetUpCount++;
+        }
+
+        [OneTimeSetUp]
+        public void Setup2()
+        {
+            SetUpCount++;
+        }
+
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            TearDownCount++;
+        }
+
+        [OneTimeTearDown]
+        public void TearDown2()
+        {
+            TearDownCount++;
+        }
+
+        [Test]
+        public void Test1() { }
+
+        [Test]
+        public void Test2() { }
+    }
+
+    [TestFixture]
+    [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
+    public class SetupTearDownLifeCycleTestFixture
+    {
+        public int SetUpCount = 0;
+        public int TearDownCount = 0;
+
+        [SetUp]
+        public void Setup()
+        {
+            SetUpCount++;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            TearDownCount++;
+        }
+
+        [Test]
+        public void Test1() { }
+
+        [Test]
+        public void Test2() { }
+    }
+
+
+    [TestFixture]
+    [FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
+    public class OneTimeSetupTearDownLifeCycleTestFixture
+    {
+        public int SetUpCount = 0;
+        public int TearDownCount = 0;
+
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            SetUpCount++;
+        }
+
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            TearDownCount++;
+        }
+ 
+        [Test]
+        public void Test1() { }
+
+        [Test]
+        public void Test2() { }
+    }
+
+    [TestFixture]
     public class CountingLifeCycleTestFixture
     {
         public int Count { get; set; }
