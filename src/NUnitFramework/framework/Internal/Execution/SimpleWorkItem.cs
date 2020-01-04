@@ -143,7 +143,7 @@ namespace NUnit.Framework.Internal.Execution
                 // Add a construct command and optionally a dispose command in case of instance per test case.
                 if (parentFixture?.LifeCycle == LifeCycle.InstancePerTestCase)
                 {
-                    command = new FixturePerTestCaseCommand(command);
+                    command = new ConstructFixturePerTestCaseCommand(command, false);
                 }
                 // If a timeout is specified, create a TimeoutCommand
                 // Timeout set at a higher level

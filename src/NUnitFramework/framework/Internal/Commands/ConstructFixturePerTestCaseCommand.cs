@@ -29,13 +29,14 @@ namespace NUnit.Framework.Internal.Commands
     /// <summary>
     /// ConstructFixtureCommand constructs the user test object if necessary.
     /// </summary>
-    public class FixturePerTestCaseCommand : BeforeAndAfterTestCommand
+    public class ConstructFixturePerTestCaseCommand : BeforeAndAfterTestCommand
     {
         /// <summary>
         /// Handles the construction and disposement of a fixture per test case
         /// </summary>
         /// <param name="innerCommand">The inner command to which the command applies</param>
-        public FixturePerTestCaseCommand(TestCommand innerCommand)
+        /// <param name="oneTimeSetup">True if used as part of a one time setup</param>
+        public ConstructFixturePerTestCaseCommand(TestCommand innerCommand, bool oneTimeSetup)
             : base(innerCommand)
         {
             TestSuite testSuite = null;
@@ -49,7 +50,7 @@ namespace NUnit.Framework.Internal.Commands
                 currentTest = currentTest.Parent;
             }
 
-            Guard.ArgumentValid(testSuite != null, "FixturePerTestCaseCommand must reference a TestSuite", nameof(innerCommand));
+            Guard.ArgumentValid(testSuite != null, "ConstructFixturePerTestCaseCommand must reference a TestSuite", nameof(innerCommand));
 
             BeforeTest = (context) =>
             {
@@ -57,7 +58,11 @@ namespace NUnit.Framework.Internal.Commands
 
                 if (typeInfo != null && !typeInfo.IsStaticClass)
                 {
-                    context.TestObject = typeInfo.Construct(testSuite.Arguments);
+                    if (oneTimeSetup)
+                    {
+                        Guard.OperationValid(Test.Fixture != null, "ConstructFixturePerTestCaseCommand cannot be used with a predefine instance");
+                    }
+                    context.TestObject = Test.Fixture ?? typeInfo.Construct(testSuite.Arguments);
                     Test.Fixture = context.TestObject;
                 }
             };
@@ -73,8 +78,9 @@ namespace NUnit.Framework.Internal.Commands
                         if (disposable != null)
                         {
                             disposable.Dispose();
-                            context.TestObject = null;
                         }
+
+                        context.TestObject = null;
                     }
                     catch (Exception ex)
                     {

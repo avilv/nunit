@@ -214,8 +214,13 @@ namespace NUnit.Framework.Internal.Execution
                     command = new OneTimeSetUpCommand(command, item);
 
                 // Construct the fixture if necessary
-                if (!Test.TypeInfo.IsStaticClass && (Test as TestFixture)?.LifeCycle != LifeCycle.InstancePerTestCase)
-                    command = new ConstructFixtureCommand(command);
+                if (!Test.TypeInfo.IsStaticClass)
+                {
+                    if ((Test as TestFixture)?.LifeCycle == LifeCycle.InstancePerTestCase)
+                        command = new ConstructFixturePerTestCaseCommand(command, true);
+                    else
+                        command = new ConstructFixtureCommand(command);
+                }
             }
 
             // Prefix with any IApplyToContext items from attributes
