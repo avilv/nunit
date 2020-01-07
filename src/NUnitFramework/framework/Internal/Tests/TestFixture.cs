@@ -34,7 +34,7 @@ namespace NUnit.Framework.Internal
         /// <summary>
         /// The life cycle specified for the current test fixture.
         /// </summary>
-        public LifeCycle LifeCycle { get; set; }
+        public LifeCycle LifeCycle { get; set; } = LifeCycle.InstancePerTestCase;
 
         #region Constructor
 
